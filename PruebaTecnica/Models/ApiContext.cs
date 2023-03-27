@@ -17,25 +17,18 @@ namespace PruebaTecnica.Models
         {
         }
 
-        public virtual DbSet<Marca> Marcas { get; set; } = null!;
-        public virtual DbSet<Modelo> Modelos { get; set; } = null!;
-        public virtual DbSet<Vehiculo> Vehiculos { get; set; } = null!;
+        public virtual DbSet<Marca> Marcas { get; set; } 
+        public virtual DbSet<Modelo> Modelos { get; set; }
+        public virtual DbSet<Vehiculo> Vehiculos { get; set; } 
 
-        public virtual DbSet<vwVehiculos> vwVehiculos { get; set; } = null!;
-
-
-        public virtual DbSet<vwModelos> vwModelos { get; set; } = null!;
+        public virtual DbSet<vwVehiculos> vwVehiculos { get; set; } 
 
 
+        public virtual DbSet<vwModelos> vwModelos { get; set; } 
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
 
-                optionsBuilder.UseSqlServer("Server=movilbusiness.com.do;Database=Api;User Id=jdelacruz;password=ramsel2001;");
-            }
-        }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,10 +57,7 @@ namespace PruebaTecnica.Models
                     .HasMaxLength(15)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Mar)
-                    .WithMany(p => p.Modelos)
-                    .HasForeignKey(d => d.MarId)
-                    .HasConstraintName("fk_Modelos_Marcas");
+               
             });
 
             modelBuilder.Entity<Vehiculo>(entity =>
@@ -75,7 +65,7 @@ namespace PruebaTecnica.Models
                 entity.HasKey(e => e.VehId);
 
                 entity.Property(e => e.Año)
-                    .HasColumnType("datetime")
+                    .HasColumnType("int")
                     .HasColumnName("año");
 
                 entity.Property(e => e.Estatus)

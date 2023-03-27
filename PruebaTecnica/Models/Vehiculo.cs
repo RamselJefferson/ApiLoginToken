@@ -9,7 +9,7 @@ namespace PruebaTecnica.Models
         public int? MarId { get; set; }
         public int? ModId { get; set; }
         public string? VehDecripcion { get; set; }
-        public string? Año { get; set; }
+        public int? Año { get; set; }
         public decimal? Precio { get; set; }
         public string? Estatus { get; set; }
 

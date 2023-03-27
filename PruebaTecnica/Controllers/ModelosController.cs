@@ -4,7 +4,7 @@ using PruebaTecnica.Models;
 
 namespace PruebaTecnica.Controllers
 {
-    [Route("/marcas/{marId}/modelos")]
+    [Route("api/marcas/{marId}/[controller]")]
     [ApiController]
     public class ModelosController : ControllerBase
     {
@@ -61,12 +61,19 @@ namespace PruebaTecnica.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        public IActionResult CrearModelo(int marId,[FromBody] Modelo modelo)
+        public IActionResult CrearModelo(int marId,[FromBody] ModeloDTO modeloDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            Modelo modelo = new Modelo()
+            {
+                MarId = marId,
+                ModId = _context.Modelos.Max(e => e.ModId) + 1,
+                ModDescripcion = modeloDTO.ModDescripcion
+            };
 
             _context.Modelos.Add(modelo);
             _context.SaveChanges();

@@ -5,7 +5,7 @@ using PruebaTecnica.Models;
 namespace PruebaTecnica.Controllers
 {
     [ApiController]
-    [Route("api/marcas")]
+    [Route("api/[controller]")]
     public class MarcasController : Controller
     {
         private readonly ApiContext _context;
@@ -15,17 +15,13 @@ namespace PruebaTecnica.Controllers
             _context= context;
         }
 
-
-        [HttpGet("/Marcas")]
-
+        [HttpGet]
         public IActionResult Marcas()
         {
             return Ok(_context.Marcas.ToList());
         }
 
-
-        [HttpGet("/Marcas/{id}")]
-
+        [HttpGet("{id}")]
         public IActionResult Modelos(int id)
         {
             var marca = _context.Marcas.FirstOrDefault(e => e.MarId == id);
@@ -33,7 +29,7 @@ namespace PruebaTecnica.Controllers
             return Ok(marca);
         }
 
-        [HttpDelete("/Marcas/{id}")]
+        [HttpDelete("{id}")]
         public IActionResult MarcasDelete(int id)
         {
             var marcaEliminar = _context.Marcas.FirstOrDefault(e => e.MarId == id);
@@ -42,9 +38,7 @@ namespace PruebaTecnica.Controllers
                 _context.Marcas.Remove(marcaEliminar);
                 _context.SaveChanges();
             }
-
             return Ok(marcaEliminar);
         }
-
     }
 }

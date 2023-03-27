@@ -9,6 +9,6 @@ namespace PruebaTecnica.Models
         public string? ModDescripcion { get; set; }
         public int? MarId { get; set; }
 
-        public virtual Marca? Mar { get; set; }
+        
     }
 }
