@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PruebaTecnica.Interfaces;
 using PruebaTecnica.Models;
+using PruebaTecnica.Repositories;
 
 namespace PruebaTecnica.Controllers
 {
@@ -9,15 +11,23 @@ namespace PruebaTecnica.Controllers
     public class ModelosController : ControllerBase
     {
         private readonly ApiContext _context;
-        public ModelosController(ApiContext context)
+        private readonly IModelosRepository _modelosRepository;
+        private readonly IvwModelosRepository _IvwModelosRepository;
+        public ModelosController(
+            ApiContext context,
+            IModelosRepository IModelosRepository,
+            IvwModelosRepository IvwModelosRepository
+            )
         {
             _context = context;
+            _modelosRepository = IModelosRepository;
+            _IvwModelosRepository = IvwModelosRepository;
         }
 
         [HttpGet]
         public IActionResult Modelos(int marId)
         {
-            var modelos = _context.vwModelos.Where(e => e.MarId == marId).ToList();
+            var modelos = _IvwModelosRepository.Where(e => e.MarId == marId);
 
             if (modelos == null) {
                 return NotFound();
@@ -30,7 +40,7 @@ namespace PruebaTecnica.Controllers
         [HttpGet("{modId}")]
         public IActionResult Modelos(int marId, int modId)
         {
-            var modelos = _context.vwModelos.FirstOrDefault(e => e.MarId == marId && e.ModId == modId);
+            var modelos = _IvwModelosRepository.GetFirst(e => e.MarId == marId && e.ModId == modId);
 
             if (modelos == null)
             {
@@ -44,17 +54,17 @@ namespace PruebaTecnica.Controllers
         [HttpDelete("{modId}")]
         public IActionResult BorrarModelo(int marId, int modId)
         {
-            var modelos = _context.Modelos.FirstOrDefault(e => e.MarId == marId && e.ModId == modId);
+            var modelos = _modelosRepository.GetFirst(e => e.MarId == marId && e.ModId == modId);
 
             if (modelos == null)
             {
                 return NotFound();
             }
 
-            _context.Modelos.Remove(modelos);
-            _context.SaveChanges();
+            _modelosRepository.Delete(modelos);
+            
 
-            return Ok(modelos);
+            return Ok();
 
         }
         [HttpPost]
@@ -75,11 +85,28 @@ namespace PruebaTecnica.Controllers
                 ModDescripcion = modeloDTO.ModDescripcion
             };
 
-            _context.Modelos.Add(modelo);
-            _context.SaveChanges();
-
+            _modelosRepository.Add(modelo);
+           
             
             return CreatedAtAction(nameof(CrearModelo), modelo);
+
+
+        }
+        [HttpPut]
+        public IActionResult ActualizarModelo(int id, [FromBody] ModeloDTO modeloDTO)
+        {
+            var modeloActualizar = _modelosRepository.GetFirst(e => e.ModId == id);
+
+            if (modeloActualizar == null)
+            {
+                return NotFound();
+            }
+
+            modeloActualizar.ModDescripcion = modeloDTO.ModDescripcion != null ? modeloDTO.ModDescripcion : modeloActualizar.ModDescripcion;
+           
+            _modelosRepository.Update(modeloActualizar);
+
+            return Ok();
 
 
         }

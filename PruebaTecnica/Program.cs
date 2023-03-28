@@ -15,6 +15,9 @@ builder.Services.AddDbContext<ApiContext>(options =>
 
 builder.Services.AddScoped<IVehiculosRepository, VehiculoRepository>();
 builder.Services.AddScoped<IvwVehiculosRepository, vwVehiculosRepository>();
+builder.Services.AddScoped<IMarcasRepository, MarcasRepository>();
+builder.Services.AddScoped<IModelosRepository, ModelosRepository>();
+builder.Services.AddScoped<IvwModelosRepository, vwModelosRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

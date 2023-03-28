@@ -16,7 +16,11 @@ namespace PruebaTecnica.Repositories
             dbSet = _context.Set<T>();
             
         }
-  
+
+        public List<T> Where(Expression<Func<T, bool>> predicate)
+        {
+            return dbSet.Where(predicate).ToList();
+        }
         public void Delete(T entity)
         {
             dbSet.Remove(entity);

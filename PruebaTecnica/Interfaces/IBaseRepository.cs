@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PruebaTecnica.Models;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -17,7 +18,7 @@ namespace PruebaTecnica.Interfaces
 
         void Add(T entity);
 
-
+        List<T> Where(Expression<Func<T, bool>> predicate);
         IEnumerable<T> GetAll();
 
 
