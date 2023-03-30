@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using PruebaTecnica.Interfaces;
 using PruebaTecnica.Models;
 using PruebaTecnica.Repositories;
+using PruebaTecnica.Unit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +15,8 @@ builder.Services.AddDbContext<ApiContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
 
-builder.Services.AddScoped<IVehiculosRepository, VehiculoRepository>();
-builder.Services.AddScoped<IvwVehiculosRepository, vwVehiculosRepository>();
-builder.Services.AddScoped<IMarcasRepository, MarcasRepository>();
-builder.Services.AddScoped<IModelosRepository, ModelosRepository>();
-builder.Services.AddScoped<IvwModelosRepository, vwModelosRepository>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

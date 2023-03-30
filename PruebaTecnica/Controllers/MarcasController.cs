@@ -9,27 +9,25 @@ namespace PruebaTecnica.Controllers
     [Route("api/[controller]")]
     public class MarcasController : Controller
     {
-        private readonly ApiContext _context;
-        private readonly IMarcasRepository _IMarcasRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public MarcasController(
-                                ApiContext context,
-                                IMarcasRepository marcasRepository)
+        public MarcasController(IUnitOfWork unitOfWork)
         {
-            _context= context;
-            _IMarcasRepository= marcasRepository;
+
+            _unitOfWork = unitOfWork;
+       
         }
 
         [HttpGet]
         public IActionResult Marcas()
         {
-            return Ok(_IMarcasRepository.GetAll());
+            return Ok(_unitOfWork.IMarcasRepository.GetAll());
         }
 
         [HttpGet("{id}")]
         public IActionResult Modelos(int id)
         {
-            var marca = _IMarcasRepository.GetFirst(e => e.MarId == id);
+            var marca = _unitOfWork.IMarcasRepository.GetFirst(e => e.MarId == id);
 
             return Ok(marca);
         }
@@ -37,10 +35,10 @@ namespace PruebaTecnica.Controllers
         [HttpDelete("{id}")]
         public IActionResult MarcasDelete(int id)
         {
-            var marcaEliminar = _IMarcasRepository.GetFirst(e => e.MarId == id);
+            var marcaEliminar = _unitOfWork.IMarcasRepository.GetFirst(e => e.MarId == id);
 
             if(marcaEliminar != null) {
-                _IMarcasRepository.Delete(marcaEliminar);               
+                _unitOfWork.IMarcasRepository.Delete(marcaEliminar);               
             }
             return Ok();
         }
@@ -58,13 +56,13 @@ namespace PruebaTecnica.Controllers
 
             Marca marca = new Marca()
             {
-                MarId = _context.Marcas.Max(e => e.MarId) + 1,
+                //MarId = _context.Marcas.Max(e => e.MarId) + 1,
 
                 MarDecripcion = model.MarDecripcion
             };
             if(marca.MarDecripcion !=null)
             {
-                _IMarcasRepository.Add(marca);
+                _unitOfWork.IMarcasRepository.Add(marca);
             }
             else
             {
@@ -77,7 +75,7 @@ namespace PruebaTecnica.Controllers
         [HttpPut("{id}")]
         public IActionResult ActualizarMarca(int id, [FromBody] MarcaDTO marcaDTO)
         {
-            var marcaActualizar = _IMarcasRepository.GetFirst(e => e.MarId == id);
+            var marcaActualizar = _unitOfWork.IMarcasRepository.GetFirst(e => e.MarId == id);
 
             if (marcaActualizar == null)
             {
@@ -86,7 +84,7 @@ namespace PruebaTecnica.Controllers
 
             marcaActualizar.MarDecripcion = marcaDTO.MarDescripcion != null ? marcaDTO.MarDescripcion : marcaActualizar.MarDecripcion;
 
-            _IMarcasRepository.Update(marcaActualizar);
+            _unitOfWork.IMarcasRepository.Update(marcaActualizar);
 
             return Ok();
 

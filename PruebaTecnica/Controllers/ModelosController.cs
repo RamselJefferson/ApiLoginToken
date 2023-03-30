@@ -10,24 +10,18 @@ namespace PruebaTecnica.Controllers
     [ApiController]
     public class ModelosController : ControllerBase
     {
-        private readonly ApiContext _context;
-        private readonly IModelosRepository _modelosRepository;
-        private readonly IvwModelosRepository _IvwModelosRepository;
-        public ModelosController(
-            ApiContext context,
-            IModelosRepository IModelosRepository,
-            IvwModelosRepository IvwModelosRepository
-            )
+        private readonly IUnitOfWork _unitOfWork;
+
+        public ModelosController( IUnitOfWork unitOfWork )
         {
-            _context = context;
-            _modelosRepository = IModelosRepository;
-            _IvwModelosRepository = IvwModelosRepository;
+            _unitOfWork = unitOfWork;
         }
+
 
         [HttpGet]
         public IActionResult Modelos(int marId)
         {
-            var modelos = _IvwModelosRepository.Where(e => e.MarId == marId);
+            var modelos = _unitOfWork.IvwModelosRepository.Where(e => e.MarId == marId);
 
             if (modelos == null) {
                 return NotFound();
@@ -40,7 +34,7 @@ namespace PruebaTecnica.Controllers
         [HttpGet("{modId}")]
         public IActionResult Modelos(int marId, int modId)
         {
-            var modelos = _IvwModelosRepository.GetFirst(e => e.MarId == marId && e.ModId == modId);
+            var modelos = _unitOfWork.IvwModelosRepository.GetFirst(e => e.MarId == marId && e.ModId == modId);
 
             if (modelos == null)
             {
@@ -54,14 +48,14 @@ namespace PruebaTecnica.Controllers
         [HttpDelete("{modId}")]
         public IActionResult BorrarModelo(int marId, int modId)
         {
-            var modelos = _modelosRepository.GetFirst(e => e.MarId == marId && e.ModId == modId);
+            var modelos = _unitOfWork.IModelosRepository.GetFirst(e => e.MarId == marId && e.ModId == modId);
 
             if (modelos == null)
             {
                 return NotFound();
             }
 
-            _modelosRepository.Delete(modelos);
+            _unitOfWork.IModelosRepository.Delete(modelos);
             
 
             return Ok();
@@ -81,11 +75,11 @@ namespace PruebaTecnica.Controllers
             Modelo modelo = new Modelo()
             {
                 MarId = marId,
-                ModId = _context.Modelos.Max(e => e.ModId) + 1,
+                //ModId = _context.Modelos.Max(e => e.ModId) + 1,
                 ModDescripcion = modeloDTO.ModDescripcion
             };
 
-            _modelosRepository.Add(modelo);
+            _unitOfWork.IModelosRepository.Add(modelo);
            
             
             return CreatedAtAction(nameof(CrearModelo), modelo);
@@ -95,7 +89,7 @@ namespace PruebaTecnica.Controllers
         [HttpPut]
         public IActionResult ActualizarModelo(int id, [FromBody] ModeloDTO modeloDTO)
         {
-            var modeloActualizar = _modelosRepository.GetFirst(e => e.ModId == id);
+            var modeloActualizar = _unitOfWork.IModelosRepository.GetFirst(e => e.ModId == id);
 
             if (modeloActualizar == null)
             {
@@ -103,8 +97,8 @@ namespace PruebaTecnica.Controllers
             }
 
             modeloActualizar.ModDescripcion = modeloDTO.ModDescripcion != null ? modeloDTO.ModDescripcion : modeloActualizar.ModDescripcion;
-           
-            _modelosRepository.Update(modeloActualizar);
+
+            _unitOfWork.IModelosRepository.Update(modeloActualizar);
 
             return Ok();
 

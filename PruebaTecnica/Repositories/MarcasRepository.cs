@@ -8,6 +8,7 @@ namespace PruebaTecnica.Repositories
     {
         public MarcasRepository(ApiContext context) : base(context)
         {
+
         }
     }
 }

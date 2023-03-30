@@ -16,9 +16,11 @@ namespace PruebaTecnica.Interfaces
 
         T GetFirst(Expression<Func<T, bool>> filter);
 
+        T
+
         void Add(T entity);
 
-        List<T> Where(Expression<Func<T, bool>> predicate);
+        IEnumerable<T> Where(Expression<Func<T, bool>> predicate);
         IEnumerable<T> GetAll();
 
 

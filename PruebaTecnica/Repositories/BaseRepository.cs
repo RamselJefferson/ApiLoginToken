@@ -17,7 +17,7 @@ namespace PruebaTecnica.Repositories
             
         }
 
-        public List<T> Where(Expression<Func<T, bool>> predicate)
+        public IEnumerable<T> Where(Expression<Func<T, bool>> predicate)
         {
             return dbSet.Where(predicate).ToList();
         }

@@ -11,9 +11,9 @@ namespace PruebaTecnica.ViewModel
         public string? ModDescripcion { get; set; }
 
         
-        public Decimal Precio { get; set; }
+        public decimal Precio { get; set; }
 
-        public DateTime Año { get; set; }
+        public int? Año { get; set; }
 
         public string? Estatus { get; set; }
 

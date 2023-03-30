@@ -11,51 +11,38 @@ namespace PruebaTecnica.Controllers
     [ApiController]
     public class VehiculosController : ControllerBase
     {
-        private readonly ApiContext _context;
-        private readonly IVehiculosRepository  _IVehiculosRepository;
-        private readonly IvwVehiculosRepository _IvwVehiculosRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
 
-        public VehiculosController(
-            ApiContext context,
-            IVehiculosRepository IVehiculosRepository,
-            IvwVehiculosRepository IvwVehiculosRepository
-            )
-        {
-            _context = context;
-            _IVehiculosRepository = IVehiculosRepository;
-            _IvwVehiculosRepository = IvwVehiculosRepository;
-        }
+        public VehiculosController(IUnitOfWork unitOfWork){_unitOfWork = unitOfWork;}
 
 
         [HttpGet]     
         public IActionResult Vehiculos()
         {
-            var vehiculos = _IvwVehiculosRepository.GetAll();
+            var vehiculos = _unitOfWork.IvwVehiculosRepository.GetAll();
             return Ok(vehiculos);
         }
+
 
         [HttpGet("{id}")]
         public IActionResult Vehiculos(int id)
         {
-            var vehiculo = _IvwVehiculosRepository.GetFirst(e => e.VehId == id);
+            var vehiculo = _unitOfWork.IvwVehiculosRepository.GetFirst(e => e.VehId == id);
 
             return Ok(vehiculo);
         }
 
 
 
-
-
-
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var vehiculo = _IVehiculosRepository.GetFirst(e => e.VehId == id);
+            var vehiculo = _unitOfWork.IVehiculosRepository.GetFirst(e => e.VehId == id);
 
             if(vehiculo != null)
             {
-                _IVehiculosRepository.Delete(vehiculo);
+                _unitOfWork.IVehiculosRepository.Delete(vehiculo);
              }
 
 
@@ -65,7 +52,7 @@ namespace PruebaTecnica.Controllers
         [HttpPost]
         public IActionResult CrearVehiculo( [FromBody] Vehiculo model)
         {
-            _IVehiculosRepository.Add(model);
+            _unitOfWork.IVehiculosRepository.Add(model);
            
 
             return CreatedAtAction(nameof(Vehiculos), new { id = model.VehId }, model);
@@ -75,7 +62,7 @@ namespace PruebaTecnica.Controllers
         [HttpPut("{id}")]
         public IActionResult ActualizarVehiculo(int id,[FromBody] VehiculoUpdateDTO vehiculoUpdateDTO)
         {
-            var vehiculoActualizar = _IVehiculosRepository.GetFirst(e => e.VehId == id);
+            var vehiculoActualizar = _unitOfWork.IVehiculosRepository.GetFirst(e => e.VehId == id);
 
             if(vehiculoActualizar == null)
             {
@@ -87,7 +74,7 @@ namespace PruebaTecnica.Controllers
             vehiculoActualizar.Estatus = vehiculoUpdateDTO.Estatus != null ? vehiculoUpdateDTO.Estatus : vehiculoActualizar.Estatus;
             vehiculoActualizar.Precio = vehiculoUpdateDTO.Precio != null ? vehiculoUpdateDTO.Precio : vehiculoActualizar.Precio;
 
-            _IVehiculosRepository.Update(vehiculoActualizar);
+            _unitOfWork.IVehiculosRepository.Update(vehiculoActualizar);
 
             return Ok();
             
