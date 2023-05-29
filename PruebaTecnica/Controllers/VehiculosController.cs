@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PruebaTecnica.Interfaces;
 using PruebaTecnica.Models;
 using PruebaTecnica.ViewModel;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace PruebaTecnica.Controllers
@@ -38,20 +39,45 @@ namespace PruebaTecnica.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var vehiculo = _unitOfWork.IVehiculosRepository.GetFirst(e => e.VehId == id);
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var rToken = JwtValidarToken.ValidarToken(identity);
 
-            if(vehiculo != null)
+            if (!rToken.success) return rToken;
+
+            Usuario usuario = rToken.result;
+
+            if(usuario.Rol == 1)
             {
-                _unitOfWork.IVehiculosRepository.Delete(vehiculo);
-             }
+                var vehiculo = _unitOfWork.IVehiculosRepository.GetFirst(e => e.VehId == id);
+
+                if (vehiculo != null)
+                {
+                    _unitOfWork.IVehiculosRepository.Delete(vehiculo);
+                }
 
 
-            return Ok();
+                return Ok();
+
+            }
+
+            return new JsonResult(new
+            {
+                success = false,
+                message = "No tiene permisos para eliminar",
+                result = ""
+            });
+
+          
         }
 
         [HttpPost]
         public IActionResult CrearVehiculo( [FromBody] Vehiculo model)
         {
+            var maxVehId = _unitOfWork.IVehiculosRepository.ObtenerMaxIdVeh() ;
+
+            
+            model.VehId = maxVehId + 1;
+
             _unitOfWork.IVehiculosRepository.Add(model);
            
 

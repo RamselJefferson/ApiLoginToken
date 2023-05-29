@@ -5,6 +5,7 @@ namespace PruebaTecnica.Interfaces
     public interface IVehiculosRepository : IBaseRepository<Vehiculo>
     {
 
-        
+        int ObtenerMaxIdVeh();
+
     }
 }

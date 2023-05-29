@@ -2,6 +2,7 @@
 using PruebaTecnica.Interfaces;
 using PruebaTecnica.Models;
 using System.Linq.Expressions;
+using System.Security.Claims;
 
 namespace PruebaTecnica.Repositories
 {
@@ -45,12 +46,15 @@ namespace PruebaTecnica.Repositories
             _context.SaveChanges();
         }
 
+ 
+
 
         public IEnumerable<T> GetAll()
         {
             IEnumerable<T> data = dbSet.AsNoTracking().ToList();
             return data;
         }
+
 
 
     }

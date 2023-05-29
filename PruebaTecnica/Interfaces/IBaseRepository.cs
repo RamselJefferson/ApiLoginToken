@@ -16,7 +16,7 @@ namespace PruebaTecnica.Interfaces
 
         T GetFirst(Expression<Func<T, bool>> filter);
 
-        T
+        
 
         void Add(T entity);
 

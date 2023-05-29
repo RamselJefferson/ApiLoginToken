@@ -19,6 +19,8 @@ namespace PruebaTecnica.Models
 
         public virtual DbSet<Marca> Marcas { get; set; } 
         public virtual DbSet<Modelo> Modelos { get; set; }
+
+        public virtual DbSet<Usuario> Usuario { get; set; }
         public virtual DbSet<Vehiculo> Vehiculos { get; set; } 
 
         public virtual DbSet<vwVehiculos> vwVehiculos { get; set; } 
