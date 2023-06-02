@@ -37,10 +37,11 @@ namespace PruebaTecnica.Controllers
 
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, string token)
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var rToken = JwtValidarToken.ValidarToken(identity);
+
+            
+            var rToken = JwtValidarToken.ValidarToken(token);
 
             if (!rToken.success) return rToken;
 

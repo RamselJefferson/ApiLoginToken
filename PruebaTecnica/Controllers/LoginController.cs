@@ -31,7 +31,7 @@ namespace PruebaTecnica.Controllers
             string user = dataCli.Usuario.ToString();
             string password = dataCli.Password.ToString();
 
-            var usuario = _context.Usuario.FirstOrDefault(e => e.UsuarioName == user && e.Password == password);
+            var usuario = _context.Usuario.Where(e => e.UsuarioName == user && e.Password == password).FirstOrDefault();
 
             if (usuario == null)
             {
@@ -48,8 +48,6 @@ namespace PruebaTecnica.Controllers
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub,jwt.Subject),
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat,DateTime.Now.ToString()),
                 new Claim("idUsuario",usuario.IdUsuario.ToString()),
                 new Claim("rol",usuario.Rol.ToString()),
                 new Claim("usuarioName",usuario.UsuarioName.ToString())
@@ -63,6 +61,7 @@ namespace PruebaTecnica.Controllers
                 jwt.Issuer,
                 jwt.Audience,
                 claims,
+                expires: DateTime.UtcNow.AddMinutes(60),
                 signingCredentials: inicio
 
                 );
@@ -77,11 +76,11 @@ namespace PruebaTecnica.Controllers
         }
 
 
-        [HttpPost("ValidarToken")]
+        [HttpGet("ValidarToken")]
         public  dynamic ValidarToken(string token)
         {
-            try
-            {
+
+           
                 if (string.IsNullOrEmpty(token))
                 {
                     return new
@@ -91,17 +90,28 @@ namespace PruebaTecnica.Controllers
                         result = ""
                     };
                 }
-             
-                var tokenHandler = new JwtSecurityTokenHandler();
+               
+
+              
+            try
+            {
+                var jwt = _configuration.GetSection("Jwt").Get<Jwt>();
                 var validationParameters = new TokenValidationParameters
-                { 
-
-
-
+                {
+                    ValidateLifetime = true,
+                    ValidateIssuer = true,
+                    ValidIssuer = jwt.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwt.Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
+                    // Añade otros parámetros de validación según tus necesidades
                 };
+                var tokenHandler = new JwtSecurityTokenHandler();
+                ClaimsPrincipal claimsPrincipal;
 
                 // Intenta validar el token
-                var claimsPrincipal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                 claimsPrincipal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
 
                 // Si la validación es exitosa, extrae el ID de usuario del token
                 var id = claimsPrincipal.FindFirst("idUsuario").Value;
@@ -134,6 +144,24 @@ namespace PruebaTecnica.Controllers
                     result = ""
                 };
             }
+        }
+
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] UsuarioDTO usuarioDTO)
+        {
+
+            Usuario usuario = new Usuario
+            {
+                UsuarioName = usuarioDTO.UsuarioName,
+                Password = usuarioDTO.Password,
+                Rol = usuarioDTO.Rol,
+                Email = usuarioDTO.Email
+            };
+
+            _context.Usuario.Add(usuario);
+          
+
+            return Ok();
         }
     }
 }
