@@ -27,7 +27,6 @@ namespace PruebaTecnica.Controllers
         public dynamic IniciarSesion([FromBody] Login dataCli)
         {
 
-
             string user = dataCli.Usuario.ToString();
             string password = dataCli.Password.ToString();
 
@@ -63,7 +62,6 @@ namespace PruebaTecnica.Controllers
                 claims,
                 expires: DateTime.UtcNow.AddMinutes(60),
                 signingCredentials: inicio
-
                 );
 
             return new
@@ -72,15 +70,13 @@ namespace PruebaTecnica.Controllers
                 message = "exito",
                 result = new JwtSecurityTokenHandler().WriteToken(token)
             };
-
         }
 
 
         [HttpGet("ValidarToken")]
         public  dynamic ValidarToken(string token)
         {
-
-           
+            
                 if (string.IsNullOrEmpty(token))
                 {
                     return new
@@ -90,9 +86,7 @@ namespace PruebaTecnica.Controllers
                         result = ""
                     };
                 }
-               
-
-              
+                            
             try
             {
                 var jwt = _configuration.GetSection("Jwt").Get<Jwt>();
