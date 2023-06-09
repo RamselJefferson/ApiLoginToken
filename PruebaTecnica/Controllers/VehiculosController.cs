@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PruebaTecnica.Interfaces;
 using PruebaTecnica.Models;
@@ -35,54 +36,48 @@ namespace PruebaTecnica.Controllers
         }
 
 
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id, string token)
+       
+        [HttpPost("{id}")]
+        public IActionResult Delete(int id)
         {
+            var encryptedToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-            
-            var rToken = JwtValidarToken.ValidarToken(token);
 
-            if (!rToken.success) return rToken;
+            var rToken = LoginController.ValidarToken(encryptedToken);
 
-            Usuario usuario = rToken.result;
 
-            if(usuario.Rol == 1)
+            var vehiculo = _unitOfWork.IVehiculosRepository.GetFirst(e => e.VehId == id);
+
+            if (vehiculo != null )
             {
-                var vehiculo = _unitOfWork.IVehiculosRepository.GetFirst(e => e.VehId == id);
-
-                if (vehiculo != null)
-                {
-                    _unitOfWork.IVehiculosRepository.Delete(vehiculo);
-                }
-
-
+                //_unitOfWork.IVehiculosRepository.Delete(vehiculo);
                 return Ok();
-
             }
 
-            return new JsonResult(new
-            {
-                success = false,
-                message = "No tiene permisos para eliminar",
-                result = ""
-            });
+            return NotFound();
 
-          
         }
 
         [HttpPost]
-        public IActionResult CrearVehiculo( [FromBody] Vehiculo model)
+        public IActionResult CrearVehiculo( [FromBody] VehiculosCreate model)
         {
-            var maxVehId = _unitOfWork.IVehiculosRepository.ObtenerMaxIdVeh() ;
+            var maxVehId = _unitOfWork.IVehiculosRepository.ObtenerMaxIdVeh() +1 ;
 
-            
-            model.VehId = maxVehId + 1;
 
-            _unitOfWork.IVehiculosRepository.Add(model);
+            Vehiculo vehiculo = new Vehiculo
+            {
+                VehId = maxVehId,
+                ModId = model.ModId,
+                MarId = model.MarId,
+                VehDecripcion = model.VehDecripcion,
+                Estatus = model.Estatus,
+                Precio = model.Precio
+            };
+
+            _unitOfWork.IVehiculosRepository.Add(vehiculo);
            
 
-            return CreatedAtAction(nameof(Vehiculos), new { id = model.VehId }, model);
+            return CreatedAtAction(nameof(Vehiculos), new { id = maxVehId }, vehiculo);
         }
 
 
