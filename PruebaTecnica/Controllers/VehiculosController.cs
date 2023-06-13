@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PruebaTecnica.Interfaces;
 using PruebaTecnica.Models;
 using PruebaTecnica.ViewModel;
+using System.Net;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 
@@ -14,9 +15,16 @@ namespace PruebaTecnica.Controllers
     public class VehiculosController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration _configuration;
+        private readonly ApiContext _context;
 
 
-        public VehiculosController(IUnitOfWork unitOfWork){_unitOfWork = unitOfWork;}
+        public VehiculosController(IUnitOfWork unitOfWork, IConfiguration configuration, ApiContext context)
+        {
+            _unitOfWork = unitOfWork; _configuration = configuration;
+            _context = context;
+            
+        }
 
 
         [HttpGet]     
@@ -41,17 +49,21 @@ namespace PruebaTecnica.Controllers
         public IActionResult Delete(int id)
         {
             var encryptedToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-
-
-            var rToken = LoginController.ValidarToken(encryptedToken);
-
-
+            var rToken = new LoginController(_context,_configuration).ValidarToken(encryptedToken);
             var vehiculo = _unitOfWork.IVehiculosRepository.GetFirst(e => e.VehId == id);
+
 
             if (vehiculo != null )
             {
-                //_unitOfWork.IVehiculosRepository.Delete(vehiculo);
-                return Ok();
+                if(rToken.result.Rol == 1)
+                {
+                    _unitOfWork.IVehiculosRepository.Delete(vehiculo);
+                    return Ok();
+                }
+                else
+                {                   
+                    return StatusCode((int)HttpStatusCode.Forbidden, "No tiene Permisos"); ;
+                }
             }
 
             return NotFound();
